@@ -30,18 +30,34 @@ const StartupCard = ({ post }: { post: StartupTypeCard }) => {
           <Link href={`/user/${author?._id}`}>
             <p className="text-16-medium line-clamp-1">{author?.name}</p>
           </Link>
-          <Link href={`/startup/${_id}`}>
-            <h3 className="text-26-semibold line-clamp-1">{title}</h3>
-
-            <Image
-              src="https://placehold.co/48*48"
-              alt="placeholder"
-              width={48}
-              height={48}
-              className="rounded-full"
-            />
-          </Link>
         </div>
+        <Link href={`/startup/${_id}`}>
+          <h3 className="text-26-semibold line-clamp-1">{title}</h3>
+
+          <Image
+            src="https://placehold.co/48*48"
+            alt="placeholder"
+            width={48}
+            height={48}
+            className="rounded-full"
+          />
+        </Link>
+      </div>
+      <Link href={`/startup/${_id}`}>
+        <p className="startup-card_desc"></p>
+        <img
+          src={`/robots.jpg`}
+          alt="placeholder"
+          className="startup-card_img"
+        />
+      </Link>
+      <div className="flex-between gap-3 mt-5">
+        <Link href={`/?query=${category.toLowerCase()}`}>
+          <p className="text-16-medium">{category}</p>
+        </Link>
+        <button className="startup-card_btn" asChild>
+          <Link href={`/startup/${_id}`}>Details</Link>
+        </button>
       </div>
     </li>
   );
