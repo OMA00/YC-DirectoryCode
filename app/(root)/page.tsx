@@ -1,32 +1,48 @@
+// app/page.tsx
+
 import SearchForm from "@/components/SearchForm";
 import StartupCard from "@/components/StartupCard";
+import { STARTUPS_QUERY } from "@/sanity/lib/queries";
+import { sanityFetch, SanityLive } from "@/sanity/lib/live";
+import { StartupTypeCard } from "@/components/StartupCard";
+import { auth } from "@/auth";
 
-// 1. Define the component as 'async'
+// Define the component as 'async' as it performs data fetching
 const page = async ({
-  searchParams, // Assuming you corrected the prop name to standard 'searchParams'
+  // 1. Give the entire searchParams object a default value of an empty object {}
+  //    and type it as an object that *contains* the Promise, as Next.js is passing it.
+  searchParams = {},
 }: {
-  // 2. Define the prop as a Promise (as the error indicates it is)
-  searchParams: Promise<{ query?: string }>;
+  // 2. The type definition must reflect that the value may be a Promise
+  //    The error message implies the prop is a Promise, so we will treat it as such
+  //    for the value we extract. We use Record<string, string> for the underlying type.
+  searchParams?: Record<string, string> | Promise<Record<string, string>>;
 }) => {
-  // 3. Await the promise to get the resolved object
-  const resolvedParams = await searchParams;
+  // 3. AWAIT the searchParams object to unwrap the Promise, as instructed by the error message.
+  const resolvedSearchParams = (await searchParams) as
+    | Record<string, string>
+    | undefined;
 
-  // 4. Access the property on the resolved object. Use ?? "" for type safety.
-  const query = resolvedParams.query ?? "";
-  const posts = [
-    {
-      _createdAt: new Date(),
-      views: 55,
-      author: { _id: 1, name: "Oma" },
-      _id: 1,
-      description: "This is a description",
-      image: "/vercel.svg",
-      category: "Robots",
-      title: "We Robots",
-    },
-  ];
+  // 4. Safely get the query string from the resolved object.
+  const query = resolvedSearchParams?.query ?? "";
+
+  // 5. Define the parameters object for the Sanity fetch
+  const fetchParams = { search: query };
+
+  const session = await auth();
+  console.log(session?.id);
+
+  // 6. Fetch data from Sanity
+  const { data: posts } = await sanityFetch({
+    query: STARTUPS_QUERY,
+    params: fetchParams,
+  });
+
+  // Log the fetched data for server-side debugging
+  console.log(JSON.stringify(posts, null, 2));
 
   return (
+    // ... rest of the component (return statement, etc.)
     <>
       <section className="pink_container">
         <h1 className="heading">
@@ -38,12 +54,13 @@ const page = async ({
         </p>
         <SearchForm query={query} />
       </section>
+
       <section className="section_container">
         <p className="text-30-semibold">
           {query ? `Search results for "${query}"` : "All startups"}
         </p>
         <ul className="mt-7 card_grid">
-          {posts?.length > 0 ? (
+          {Array.isArray(posts) && posts.length > 0 ? (
             posts.map((post: StartupTypeCard) => (
               <StartupCard key={post?._id} post={post} />
             ))
@@ -52,6 +69,7 @@ const page = async ({
           )}
         </ul>
       </section>
+      <SanityLive />
     </>
   );
 };

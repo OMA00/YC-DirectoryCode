@@ -20,6 +20,7 @@ export const startup = defineType({
     defineField({
       name: "author",
       type: "reference",
+      // FIX APPLIED: 'to' is now an array
       to: [{ type: "author" }],
     }),
     defineField({

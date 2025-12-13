@@ -3,6 +3,9 @@ import { EyeIcon } from "lucide-react";
 import React from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { Author, Startup } from "@/sanity/types";
+
+export type StartupTypeCard = Omit<Startup, "author"> & { author?: Author };
 
 const StartupCard = ({ post }: { post: StartupTypeCard }) => {
   const {
@@ -35,7 +38,7 @@ const StartupCard = ({ post }: { post: StartupTypeCard }) => {
           <h3 className="text-26-semibold line-clamp-1">{title}</h3>
 
           <Image
-            src="https://placehold.co/48*48"
+            src="https://placehold.co/48x48"
             alt="placeholder"
             width={48}
             height={48}
@@ -45,8 +48,13 @@ const StartupCard = ({ post }: { post: StartupTypeCard }) => {
       </div>
       <Link href={`/startup/${_id}`}>
         <p className="startup-card_desc"></p>
+        <img src={"/robots.jpg"} alt={title} className="startup-card_img" />
+      </Link>
+      <Link href={`/startup/${_id}`}>
+        <p className="startup-card_desc">{description}</p>
+
         <img
-          src={`/robots.jpg`}
+          src={"/robots.jpg"}
           alt="placeholder"
           className="startup-card_img"
         />
